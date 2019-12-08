@@ -8,6 +8,13 @@ See also: https://en.wikipedia.org/wiki/Edit_decision_list
 This is not a complete EDL parser. It's a tool which I quickly hacked on a sunday morning to get some content for
 my purpose out of some EDL files. Use with caution. 
 
+We will output the frame fractions for the date part as Excel-friendly time fractions. The fractions will be 
+calculated based on a 25 fps format. You will have to adapt the code to fix this.
+
+Example input file:
+
+Example output:
+
 # How to Build
 
 This program was written in Java. To build the software, you

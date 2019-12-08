@@ -15,6 +15,15 @@ import static de.stativkarawane.tools.edl.parser.EdlDefinition.*;
 public class Main {
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
+
+	/**
+	 * Use 25 fps (frames per second) for converting time fractions.
+	 */
+	private static final int FPS_RATE = 25;
+
+	/**
+	 * Column delimiter, we chose ";" since this is not a part of all our files.
+	 */
 	private static final String COLUMN_DELIMITER = ";";
 
 	public static void main(String[] args) throws FileNotFoundException {
@@ -92,10 +101,10 @@ public class Main {
 					Integer.toString(info.getId()),
 					info.getTitle(),
 					info.getClipName(),
-					info.getFinalProductionStartTime(),
-					info.getFinalProductionEndTime(),
-					info.getClaimedClipStartTime(),
-					info.getClaimedClipEndTime());
+					convertTimeToFractions(info.getFinalProductionStartTime()),
+					convertTimeToFractions(info.getFinalProductionEndTime()),
+					convertTimeToFractions(info.getClaimedClipStartTime()),
+					convertTimeToFractions(info.getClaimedClipEndTime()));
 		}
 	}
 
@@ -105,6 +114,27 @@ public class Main {
 			System.out.print(COLUMN_DELIMITER);
 		}
 		System.out.println();
+	}
+
+	/**
+	 * Convert into Excel-friendly fractions of a second based on the FPS rate. For 25 fps, the input 10:00:02:10 will
+	 * be converted into 10:00:02:(10/25) = 10:00:02,04.
+	 *
+	 * @param s the EDL time
+	 * @return the Excel-friendly time.
+	 */
+	protected static String convertTimeToFractions(String s) {
+		if (s == null) {
+			return s;
+		}
+		if (StringUtils.countMatches(s, ":") != 3) {
+			return s;
+		}
+		final int lastIndex = s.lastIndexOf(":");
+		final double lastFractionInFps = Integer.parseInt(s.substring(lastIndex + 1));
+		final double fractionsOfSecond = lastFractionInFps / FPS_RATE;
+		final int lastFractionInMilliSeconds = (int) (fractionsOfSecond * 1000);
+		return String.format("%s.%03d", s.substring(0, lastIndex), lastFractionInMilliSeconds);
 	}
 
 }
